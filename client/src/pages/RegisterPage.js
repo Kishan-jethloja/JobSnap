@@ -6,8 +6,7 @@ import {
   EyeSlashIcon,
   EnvelopeIcon,
   LockClosedIcon,
-  UserIcon,
-  SparklesIcon
+  UserIcon
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -79,182 +78,187 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900">
-        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl animate-float" style={{animationDelay: '3s'}}></div>
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="animated-blob w-72 h-72 bg-indigo-500/20 top-10 -left-20 animate-float"></div>
+        <div className="animated-blob w-96 h-96 bg-purple-500/20 top-40 -right-32 animate-float" style={{animationDelay: '2s'}}></div>
+        <div className="animated-blob w-80 h-80 bg-pink-500/20 bottom-20 left-20 animate-float" style={{animationDelay: '4s'}}></div>
       </div>
+      
+      <div className="max-w-md w-full relative z-10">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Create Account
+          </h1>
+          <p className="text-slate-300">
+            Join JobSnap to start your job search
+          </p>
+        </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full animate-fade-in">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25">
-              <SparklesIcon className="w-10 h-10 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-slate-200 to-purple-300 bg-clip-text text-transparent mb-3">
-              Join JobSnap
-            </h1>
-            <p className="text-slate-400 text-lg">
-              Create your account and start your job search journey
-            </p>
-          </div>
+        {/* Form Card */}
+        <div className="bg-white shadow-md rounded-lg p-8">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <div className="text-red-800 text-sm">{error}</div>
+              </div>
+            )}
 
-          {/* Form Card */}
-          <div className="glass-card">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && (
-                <div className="glass-card border-2 border-red-500/30">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-sm">!</span>
-                    </div>
-                    <div className="text-red-300">{error}</div>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-5">
-                {/* Name Field */}
-                <div className="floating-label-group">
-                  <div className="relative">
-                    <UserIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 z-10" />
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      className="floating-input pl-12"
-                      placeholder=" "
-                      value={formData.name}
-                      onChange={handleChange}
-                      disabled={loading}
-                    />
-                    <label htmlFor="name" className="floating-label ml-12">
-                      Full Name
-                    </label>
-                  </div>
-                </div>
-
-                {/* Email Field */}
-                <div className="floating-label-group">
-                  <div className="relative">
-                    <EnvelopeIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 z-10" />
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      className="floating-input pl-12"
-                      placeholder=" "
-                      value={formData.email}
-                      onChange={handleChange}
-                      disabled={loading}
-                    />
-                    <label htmlFor="email" className="floating-label ml-12">
-                      Email Address
-                    </label>
-                  </div>
-                </div>
-
-                {/* Password Field */}
-                <div className="floating-label-group">
-                  <div className="relative">
-                    <LockClosedIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 z-10" />
-                    <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      className="floating-input pl-12 pr-12"
-                      placeholder=" "
-                      value={formData.password}
-                      onChange={handleChange}
-                      disabled={loading}
-                    />
-                    <label htmlFor="password" className="floating-label ml-12">
-                      Password
-                    </label>
-                    <button
-                      type="button"
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors z-10"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeSlashIcon className="w-5 h-5" />
-                      ) : (
-                        <EyeIcon className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Confirm Password Field */}
-                <div className="floating-label-group">
-                  <div className="relative">
-                    <LockClosedIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 z-10" />
-                    <input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      required
-                      className="floating-input pl-12 pr-12"
-                      placeholder=" "
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      disabled={loading}
-                    />
-                    <label htmlFor="confirmPassword" className="floating-label ml-12">
-                      Confirm Password
-                    </label>
-                    <button
-                      type="button"
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors z-10"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeSlashIcon className="w-5 h-5" />
-                      ) : (
-                        <EyeIcon className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
+            <div className="space-y-4">
+              {/* Name Field */}
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full btn-glow py-4 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  {loading ? (
-                    <>
-                      <LoadingSpinner size="sm" />
-                      <span className="ml-3">Creating Account...</span>
-                    </>
-                  ) : (
-                    'Create Account'
-                  )}
-                </button>
+              {/* Email Field */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <EnvelopeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    placeholder="Enter your email address"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                </div>
               </div>
 
-              {/* Footer Links */}
-              <div className="text-center pt-6 border-t border-gray-700/50">
-                <p className="text-slate-400">
-                  Already have an account?{' '}
-                  <Link 
-                    to="/login" 
-                    className="font-semibold text-transparent bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text hover:from-purple-300 hover:to-indigo-300 transition-all"
+              {/* Password Field */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-black"
+                    placeholder="Create a strong password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
                   >
-                    Sign In
-                  </Link>
-                </p>
+                    {showPassword ? (
+                      <EyeSlashIcon className="w-5 h-5" />
+                    ) : (
+                      <EyeIcon className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
               </div>
-            </form>
-          </div>
+
+              {/* Confirm Password Field */}
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-black"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeSlashIcon className="w-5 h-5" />
+                    ) : (
+                      <EyeIcon className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <LoadingSpinner size="sm" />
+                    <span className="ml-2">Creating Account...</span>
+                  </div>
+                ) : (
+                  'Create Account'
+                )}
+              </button>
+            </div>
+
+            {/* Terms and Privacy */}
+            <div className="text-center pt-4">
+              <p className="text-xs text-gray-500">
+                By creating an account, you agree to our{' '}
+                <Link to="/terms" className="text-indigo-600 hover:text-indigo-500 transition-colors">
+                  Terms of Service
+                </Link>
+                {' '}and{' '}
+                <Link to="/privacy" className="text-indigo-600 hover:text-indigo-500 transition-colors">
+                  Privacy Policy
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
+
+        {/* Footer Links */}
+        <div className="text-center mt-6">
+          <p className="text-gray-600">
+            Already have an account?{' '}
+            <Link 
+              to="/login" 
+              className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+            >
+              Sign In
+            </Link>
+          </p>
         </div>
       </div>
     </div>
