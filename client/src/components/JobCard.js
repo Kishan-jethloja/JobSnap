@@ -34,12 +34,6 @@ const JobCard = ({ job, isSelected, onSelect, isPremium, showCheckbox = true }) 
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
-  const getMatchScoreColor = (score) => {
-    if (score >= 8) return 'from-emerald-500 to-green-500';
-    if (score >= 6) return 'from-blue-500 to-indigo-500';
-    if (score >= 4) return 'from-yellow-500 to-orange-500';
-    return 'from-red-500 to-pink-500';
-  };
 
   return (
     <div 
@@ -95,6 +89,12 @@ const JobCard = ({ job, isSelected, onSelect, isPremium, showCheckbox = true }) 
                       <span className="text-sm">{job.location}</span>
                     </>
                   )}
+                  {job.salary && (
+                    <>
+                      <span className="mx-2">•</span>
+                      <span className="text-sm text-green-400 font-medium">{job.salary}</span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -106,49 +106,7 @@ const JobCard = ({ job, isSelected, onSelect, isPremium, showCheckbox = true }) 
           {truncateText(job.description)}
         </p>
 
-        {/* Match Score (if available) */}
-        {job.matchScore > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between text-sm text-slate-400 mb-2">
-              <div className="flex items-center gap-2">
-                <StarIcon className="w-4 h-4" />
-                <span className="font-medium">Match Score</span>
-              </div>
-              <span className="font-bold text-white">{job.matchScore}/10</span>
-            </div>
-            <div className="w-full bg-gray-700/50 rounded-full h-3 backdrop-blur-sm">
-              <div 
-                className={`bg-gradient-to-r ${getMatchScoreColor(job.matchScore)} h-3 rounded-full transition-all duration-500 shadow-lg`}
-                style={{ width: `${Math.min((job.matchScore / 10) * 100, 100)}%` }}
-              ></div>
-            </div>
-          </div>
-        )}
 
-        {/* Matched Skills */}
-        {job.matchedSkills && job.matchedSkills.length > 0 && (
-          <div className="mb-6">
-            <p className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
-              <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
-              Matched Skills
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {job.matchedSkills.slice(0, 3).map((skill, index) => (
-                <span
-                  key={index}
-                  className="skill-tag"
-                >
-                  {skill}
-                </span>
-              ))}
-              {job.matchedSkills.length > 3 && (
-                <span className="skill-tag bg-gradient-to-r from-slate-500/20 to-gray-500/20 text-slate-400 border-slate-500/30">
-                  +{job.matchedSkills.length - 3} more
-                </span>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Tags */}
         {job.tags && job.tags.length > 0 && (
@@ -177,16 +135,25 @@ const JobCard = ({ job, isSelected, onSelect, isPremium, showCheckbox = true }) 
             <span>{formatDate(job.publication_date)}</span>
           </div>
           
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const applicationUrl = job.applicationUrl || job.url;
+              console.log('Job data:', job);
+              console.log('Application URL:', applicationUrl);
+              
+              if (applicationUrl && applicationUrl !== '#' && applicationUrl !== '') {
+                // Open the application URL in a new tab
+                window.open(applicationUrl, '_blank', 'noopener,noreferrer');
+              } else {
+                alert(`Application URL not available for this job.\nJob: ${job.title}\nCompany: ${job.company}`);
+              }
+            }}
             className="inline-flex items-center px-4 py-2 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-            onClick={(e) => e.stopPropagation()}
           >
             Apply Now
             <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
-          </a>
+          </button>
         </div>
       </div>
     </div>

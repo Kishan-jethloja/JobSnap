@@ -253,8 +253,13 @@ router.get('/fetch', async (req, res) => {
           title: job.title || 'No Title',
           company: job.company_name || job.company || 'Unknown Company',
           url: job.url || '#',
+          applicationUrl: job.job_apply_link || job.redirect_url || job.url || '#',
           description: job.description || '',
           tags: Array.isArray(job.tags) ? job.tags : [],
+          location: job.location || job.job_city || job.candidate_required_location || '',
+          salary: job.salary_min && job.salary_max ? `$${job.salary_min} - $${job.salary_max}` : '',
+          jobType: job.job_employment_type || 'Full-time',
+          experienceLevel: job.job_experience_required_display || 'Mid-level',
           publication_date: job.publication_date ? new Date(job.publication_date) : new Date(),
           cachedAt: new Date(),
           isPremiumJob: false
@@ -293,8 +298,13 @@ router.get('/fetch', async (req, res) => {
           title: job.title,
           company: job.company_name,
           url: job.url,
+          applicationUrl: job.url,
           description: job.description,
           tags: job.tags,
+          location: '',
+          salary: '',
+          jobType: 'Full-time',
+          experienceLevel: 'Mid-level',
           publication_date: new Date(job.publication_date),
           cachedAt: new Date(),
           isPremiumJob: false
@@ -324,89 +334,6 @@ router.get('/fetch', async (req, res) => {
     }
   }
 });
-
-// @route   POST /api/jobs/match
-// @desc    Match jobs with user's resume skills
-// @access  Private
-router.post('/match', authMiddleware, async (req, res) => {
-  try {
-    // Get user's resume and skills
-    const resume = await Resume.findOne({ userId: req.user.id }).sort({ uploadedAt: -1 });
-    
-    if (!resume || !resume.skills || resume.skills.length === 0) {
-      return res.status(400).json({ 
-        message: 'No resume found or no skills extracted. Please upload a resume first.' 
-      });
-    }
-
-    const userSkills = resume.skills;
-    
-    // Build query to match jobs
-    const skillRegexes = userSkills.map(skill => new RegExp(skill, 'i'));
-    
-    // Find jobs that match any of the user's skills
-    const matchingJobs = await Job.find({
-      $or: [
-        { description: { $in: skillRegexes } },
-        { tags: { $in: userSkills } },
-        { title: { $in: skillRegexes } }
-      ]
-    }).sort({ cachedAt: -1 }).limit(100);
-
-    // Score jobs based on skill matches
-    const scoredJobs = matchingJobs.map(job => {
-      let score = 0;
-      const matchedSkills = [];
-
-      userSkills.forEach(skill => {
-        const skillRegex = new RegExp(skill, 'i');
-        
-        // Check title (higher weight)
-        if (skillRegex.test(job.title)) {
-          score += 3;
-          matchedSkills.push(skill);
-        }
-        
-        // Check tags (medium weight)
-        if (job.tags.some(tag => skillRegex.test(tag))) {
-          score += 2;
-          if (!matchedSkills.includes(skill)) matchedSkills.push(skill);
-        }
-        
-        // Check description (lower weight)
-        if (skillRegex.test(job.description)) {
-          score += 1;
-          if (!matchedSkills.includes(skill)) matchedSkills.push(skill);
-        }
-      });
-
-      return {
-        ...job.toObject(),
-        matchScore: score,
-        matchedSkills: matchedSkills
-      };
-    });
-
-    // Sort by match score and recency
-    scoredJobs.sort((a, b) => {
-      if (b.matchScore !== a.matchScore) {
-        return b.matchScore - a.matchScore;
-      }
-      return new Date(b.cachedAt) - new Date(a.cachedAt);
-    });
-
-    res.json({
-      message: `Found ${scoredJobs.length} matching jobs`,
-      jobs: scoredJobs.slice(0, 50), // Limit to top 50 matches
-      userSkills: userSkills,
-      total: scoredJobs.length
-    });
-  } catch (error) {
-    console.error('Job matching error:', error);
-    res.status(500).json({ message: 'Server error while matching jobs' });
-  }
-});
-
 // @route   GET /api/jobs/search
 // @desc    Search cached jobs
 // @access  Public
@@ -479,6 +406,210 @@ router.get('/all', async (req, res) => {
   } catch (error) {
     console.error('Get all jobs error:', error);
     res.status(500).json({ message: 'Server error while fetching jobs' });
+  }
+});
+
+// @route   POST /api/jobs/match
+// @desc    Trigger job matching based on user resume
+// @access  Private
+router.post('/match', authMiddleware, async (req, res) => {
+  try {
+    // This endpoint triggers the matching process
+    // The actual matching logic is in the GET /match endpoint
+    res.json({
+      message: 'Job matching triggered successfully',
+      success: true
+    });
+  } catch (error) {
+    console.error('Job matching trigger error:', error);
+    res.status(500).json({ message: 'Server error while triggering job matching' });
+  }
+});
+
+// @route   GET /api/jobs/match
+// @desc    Get skill-matched jobs based on user resume
+// @access  Private
+router.get('/match', authMiddleware, async (req, res) => {
+  try {
+    const { limit = 20, page = 1 } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Get user's resume to extract skills
+    const resume = await Resume.findOne({ userId: req.user.id });
+    if (!resume || !resume.skills || resume.skills.length === 0) {
+      // If no resume or skills, return all jobs
+      const jobs = await Job.find({})
+        .sort({ cachedAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+      
+      const total = await Job.countDocuments({});
+      
+      return res.json({
+        jobs: jobs.map(job => ({ ...job.toObject(), matchPercentage: 0, matchedSkills: [] })),
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      });
+    }
+
+    // Extract and normalize user skills
+    const userSkills = resume.skills.map(skill => skill.toLowerCase().trim());
+    
+    // Skill variations mapping for better matching
+    const skillVariations = {
+      'javascript': ['js', 'javascript', 'ecmascript'],
+      'typescript': ['ts', 'typescript'],
+      'node.js': ['nodejs', 'node', 'node.js'],
+      'react.js': ['react', 'reactjs', 'react.js'],
+      'vue.js': ['vue', 'vuejs', 'vue.js'],
+      'angular': ['angular', 'angularjs'],
+      'python': ['python', 'py'],
+      'java': ['java'],
+      'c++': ['cpp', 'c++', 'cplusplus'],
+      'c#': ['csharp', 'c#', 'dotnet'],
+      'php': ['php'],
+      'ruby': ['ruby', 'rb'],
+      'go': ['golang', 'go'],
+      'rust': ['rust'],
+      'swift': ['swift'],
+      'kotlin': ['kotlin'],
+      'mongodb': ['mongo', 'mongodb'],
+      'postgresql': ['postgres', 'postgresql'],
+      'mysql': ['mysql'],
+      'redis': ['redis'],
+      'docker': ['docker', 'containerization'],
+      'kubernetes': ['k8s', 'kubernetes'],
+      'aws': ['aws', 'amazon web services'],
+      'azure': ['azure', 'microsoft azure'],
+      'gcp': ['gcp', 'google cloud'],
+      'git': ['git', 'version control'],
+      'html': ['html', 'html5'],
+      'css': ['css', 'css3'],
+      'sass': ['sass', 'scss'],
+      'webpack': ['webpack'],
+      'express': ['express', 'expressjs'],
+      'django': ['django'],
+      'flask': ['flask'],
+      'spring': ['spring', 'spring boot'],
+      'laravel': ['laravel'],
+      'rails': ['rails', 'ruby on rails']
+    };
+
+    // Get all jobs
+    const allJobs = await Job.find({}).sort({ cachedAt: -1 });
+    
+    // Calculate match scores for each job
+    const jobsWithScores = allJobs.map(job => {
+      let matchScore = 0;
+      let matchedSkills = [];
+      const maxScore = 100;
+
+      // Check job tags (exact matches get higher score)
+      if (job.tags && job.tags.length > 0) {
+        job.tags.forEach(tag => {
+          const normalizedTag = tag.toLowerCase().trim();
+          
+          // Direct skill match
+          if (userSkills.includes(normalizedTag)) {
+            matchScore += 5;
+            if (!matchedSkills.includes(tag)) {
+              matchedSkills.push(tag);
+            }
+          } else {
+            // Check skill variations
+            for (const [baseSkill, variations] of Object.entries(skillVariations)) {
+              if (variations.includes(normalizedTag) && userSkills.some(skill => variations.includes(skill))) {
+                matchScore += 5;
+                if (!matchedSkills.includes(tag)) {
+                  matchedSkills.push(tag);
+                }
+                break;
+              }
+            }
+          }
+        });
+      }
+
+      // Check job title for skill mentions
+      if (job.title) {
+        const titleWords = job.title.toLowerCase().split(/[\s,.-]+/);
+        titleWords.forEach(word => {
+          if (userSkills.includes(word)) {
+            matchScore += 4;
+            if (!matchedSkills.includes(word)) {
+              matchedSkills.push(word);
+            }
+          } else {
+            // Check variations in title
+            for (const [baseSkill, variations] of Object.entries(skillVariations)) {
+              if (variations.includes(word) && userSkills.some(skill => variations.includes(skill))) {
+                matchScore += 4;
+                if (!matchedSkills.includes(word)) {
+                  matchedSkills.push(word);
+                }
+                break;
+              }
+            }
+          }
+        });
+      }
+
+      // Check job description for skill mentions (partial matches)
+      if (job.description) {
+        const descriptionWords = job.description.toLowerCase().split(/[\s,.-]+/);
+        userSkills.forEach(skill => {
+          if (descriptionWords.includes(skill)) {
+            matchScore += 2;
+            if (!matchedSkills.includes(skill)) {
+              matchedSkills.push(skill);
+            }
+          }
+        });
+      }
+
+      // Bonus for multiple skill matches
+      if (matchedSkills.length > 3) {
+        matchScore += 10;
+      } else if (matchedSkills.length > 1) {
+        matchScore += 5;
+      }
+
+      // Calculate percentage (cap at 100%)
+      const matchPercentage = Math.min(Math.round((matchScore / maxScore) * 100), 100);
+
+      return {
+        ...job.toObject(),
+        matchScore,
+        matchPercentage,
+        matchedSkills: matchedSkills.slice(0, 5) // Limit to top 5 matched skills
+      };
+    });
+
+    // Sort by match score (highest first)
+    jobsWithScores.sort((a, b) => b.matchScore - a.matchScore);
+
+    // Apply pagination
+    const paginatedJobs = jobsWithScores.slice(skip, skip + parseInt(limit));
+    const total = jobsWithScores.length;
+
+    res.json({
+      jobs: paginatedJobs,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / limit)
+      },
+      userSkills: userSkills.slice(0, 10) // Return user skills for debugging
+    });
+
+  } catch (error) {
+    console.error('Job matching error:', error);
+    res.status(500).json({ message: 'Server error while matching jobs' });
   }
 });
 

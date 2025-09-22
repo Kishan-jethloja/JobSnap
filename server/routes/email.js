@@ -38,7 +38,8 @@ router.post('/sendSelectedJobs', authMiddleware, premiumMiddleware, async (req, 
     const emailResult = await sendSelectedJobsEmail({
       to: user.email,
       jobs: validJobs,
-      userName: user.name
+      userName: user.name,
+      userId: req.user.id
     });
 
     // Save selected jobs record

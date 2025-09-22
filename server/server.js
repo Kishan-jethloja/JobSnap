@@ -30,6 +30,7 @@ app.use('/api/resume', require('./routes/resume'));
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/premium', require('./routes/premium'));
 app.use('/api/email', require('./routes/email'));
+app.use('/api/gmail', require('./routes/gmail'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

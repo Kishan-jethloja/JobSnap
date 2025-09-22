@@ -73,4 +73,14 @@ export const emailAPI = {
   getStats: () => api.get('/email/stats'),
 };
 
+// Gmail API calls
+export const gmailAPI = {
+  getAuthUrl: () => api.get('/gmail/auth-url'),
+  handleCallback: (code) => api.post('/gmail/auth-callback', { code }),
+  getStatus: () => api.get('/gmail/status'),
+  createDrafts: (jobs) => api.post('/gmail/create-drafts', { jobs }),
+  getDrafts: () => api.get('/gmail/drafts'),
+  disconnect: () => api.delete('/gmail/disconnect'),
+};
+
 export default api;

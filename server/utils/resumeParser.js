@@ -1,17 +1,65 @@
 const pdfParse = require('pdf-parse');
 
-// Common tech skills and keywords to look for
+// Comprehensive tech skills and keywords to look for
 const TECH_KEYWORDS = [
-  'javascript', 'python', 'java', 'react', 'node', 'nodejs', 'express',
-  'mongodb', 'mysql', 'postgresql', 'sql', 'html', 'css', 'typescript',
-  'angular', 'vue', 'php', 'ruby', 'go', 'rust', 'swift', 'kotlin',
-  'docker', 'kubernetes', 'aws', 'azure', 'gcp', 'git', 'github',
-  'tensorflow', 'pytorch', 'keras', 'machine learning', 'ai', 'ml',
-  'data science', 'analytics', 'tableau', 'power bi', 'excel',
-  'agile', 'scrum', 'devops', 'ci/cd', 'jenkins', 'linux', 'ubuntu',
-  'redis', 'elasticsearch', 'graphql', 'rest', 'api', 'microservices',
-  'blockchain', 'solidity', 'web3', 'react native', 'flutter', 'ionic',
-  'sass', 'less', 'webpack', 'babel', 'npm', 'yarn', 'jest', 'cypress'
+  // Programming Languages
+  'javascript', 'python', 'java', 'typescript', 'php', 'ruby', 'go', 'rust', 
+  'swift', 'kotlin', 'scala', 'perl', 'r', 'matlab', 'dart', 'elixir',
+  'haskell', 'clojure', 'erlang', 'lua', 'groovy', 'objective-c',
+  
+  // Web Technologies
+  'html', 'css', 'react', 'angular', 'vue', 'svelte', 'ember', 'backbone',
+  'jquery', 'bootstrap', 'tailwind', 'sass', 'less', 'stylus',
+  'webpack', 'vite', 'parcel', 'rollup', 'babel', 'eslint', 'prettier',
+  
+  // Backend & Frameworks
+  'node', 'nodejs', 'express', 'fastify', 'koa', 'nestjs', 'django',
+  'flask', 'fastapi', 'spring', 'spring boot', 'laravel', 'symfony',
+  'rails', 'sinatra', 'asp.net', 'gin', 'echo', 'fiber',
+  
+  // Databases
+  'mongodb', 'mysql', 'postgresql', 'sqlite', 'redis', 'cassandra',
+  'dynamodb', 'firebase', 'supabase', 'prisma', 'sequelize', 'mongoose',
+  'typeorm', 'knex', 'elasticsearch', 'solr', 'neo4j', 'couchdb',
+  
+  // Cloud & DevOps
+  'aws', 'azure', 'gcp', 'docker', 'kubernetes', 'terraform', 'ansible',
+  'jenkins', 'gitlab ci', 'github actions', 'circleci', 'travis ci',
+  'nginx', 'apache', 'linux', 'ubuntu', 'centos', 'debian', 'bash',
+  
+  // Data Science & AI
+  'tensorflow', 'pytorch', 'keras', 'scikit-learn', 'pandas', 'numpy',
+  'matplotlib', 'seaborn', 'jupyter', 'anaconda', 'machine learning',
+  'deep learning', 'ai', 'ml', 'data science', 'analytics', 'statistics',
+  'tableau', 'power bi', 'looker', 'qlik', 'excel', 'spark', 'hadoop',
+  
+  // Mobile Development
+  'react native', 'flutter', 'ionic', 'xamarin', 'cordova', 'phonegap',
+  'android', 'ios', 'xcode', 'android studio',
+  
+  // Testing & Quality
+  'jest', 'cypress', 'selenium', 'mocha', 'chai', 'jasmine', 'karma',
+  'pytest', 'junit', 'testng', 'cucumber', 'postman', 'insomnia',
+  
+  // Version Control & Collaboration
+  'git', 'github', 'gitlab', 'bitbucket', 'svn', 'mercurial',
+  
+  // API & Architecture
+  'rest', 'graphql', 'grpc', 'soap', 'api', 'microservices', 'serverless',
+  'lambda', 'azure functions', 'cloud functions',
+  
+  // Blockchain & Web3
+  'blockchain', 'solidity', 'web3', 'ethereum', 'bitcoin', 'smart contracts',
+  
+  // Package Managers & Tools
+  'npm', 'yarn', 'pip', 'composer', 'maven', 'gradle', 'cargo',
+  
+  // Methodologies
+  'agile', 'scrum', 'kanban', 'devops', 'ci/cd', 'tdd', 'bdd',
+  
+  // Other Technologies
+  'redis', 'rabbitmq', 'kafka', 'websockets', 'oauth', 'jwt', 'ssl',
+  'https', 'json', 'xml', 'yaml', 'markdown'
 ];
 
 const parsePdfBuffer = async (buffer) => {

@@ -77,7 +77,7 @@ const Navbar = () => {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-3">
                   <div className="text-right">
-                    <p className="text-sm font-medium text-white">Hi, {user?.name}</p>
+                    <p className="text-sm font-medium text-white">Hi, {user?.name || 'User'}</p>
                     {isPremium && (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-yellow-400 to-orange-500 text-black">
                         ✨ PREMIUM
@@ -90,7 +90,7 @@ const Navbar = () => {
                       className="flex items-center space-x-1 p-2 rounded-xl hover:bg-slate-700/50 transition-all duration-300"
                     >
                       <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <span className="text-white text-sm font-semibold">{user?.name?.charAt(0)}</span>
+                        <span className="text-white text-sm font-semibold">{(user?.name || 'U').charAt(0)}</span>
                       </div>
                       <ChevronDownIcon className="w-4 h-4 text-slate-400" />
                     </button>
@@ -148,7 +148,7 @@ const Navbar = () => {
           <div className="px-2 py-4 space-y-2">
             {isAuthenticated && (
               <div className="px-4 py-3 border-b border-slate-600/50 mb-2">
-                <p className="text-white font-medium">Hi, {user?.name}</p>
+                <p className="text-white font-medium">Hi, {user?.name || 'User'}</p>
                 {isPremium && (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-yellow-400 to-orange-500 text-black mt-1">
                     ✨ PREMIUM

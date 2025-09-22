@@ -132,7 +132,7 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent mb-2">
-                      Welcome back, {user?.name}! 👋
+                      Welcome back, {user?.name || 'User'}! 👋
                     </h1>
                     <p className="text-slate-400 text-lg">
                       Ready to find your next opportunity? Let's continue your job search journey.

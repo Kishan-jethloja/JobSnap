@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { jobsAPI } from '../api/api';
 import JobCard from '../components/JobCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { mockJobs } from '../data/mockJobs';
+import axios from 'axios';
 import { 
   MagnifyingGlassIcon, 
   AdjustmentsHorizontalIcon,
@@ -13,6 +15,7 @@ import {
 
 const JobList = () => {
   const { isPremium } = useAuth();
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [selectedJobs, setSelectedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,58 +27,50 @@ const JobList = () => {
   const [allJobs, setAllJobs] = useState([]);
 
   useEffect(() => {
-    fetchMatchedJobs();
+    fetchAllJobs();
   }, []);
 
-  const fetchMatchedJobs = async () => {
+  const fetchAllJobs = async () => {
     setLoading(true);
     setError('');
     setFetchingStatus('');
     
-    // Step 1: Fetch all available jobs
-    setFetchingStatus('🔍 Fetching jobs from multiple sources...');
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Try to fetch from server first
-    let fetchedJobs = [];
     try {
-      setFetchingStatus('📡 Trying external job APIs...');
-      const response = await jobsAPI.fetchJobs({ limit: 50 });
-      if (response.data.jobs && response.data.jobs.length > 0) {
-        fetchedJobs = response.data.jobs;
-        setFetchingStatus('✅ Jobs fetched from server');
-      }
-    } catch (error) {
-      setFetchingStatus('⚠️ Server unavailable, using local job database...');
+      setFetchingStatus('📋 Loading available jobs...');
       await new Promise(resolve => setTimeout(resolve, 500));
+      
+      let allJobs = [];
+      
+      try {
+        const allJobsResponse = await axios.get('/api/jobs/all?limit=50');
+        allJobs = allJobsResponse.data.jobs || [];
+        setFetchingStatus('✅ Jobs loaded successfully');
+      } catch (error) {
+        console.log('API failed, using mock data:', error.message);
+        // Fallback to mock data if API fails
+        allJobs = mockJobs.map(job => ({
+          ...job,
+          _id: job.apiJobId,
+          apiJobId: job.apiJobId,
+          company: job.company,
+          applicationUrl: job.url
+        }));
+        setFetchingStatus('📋 Using sample job data');
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
+      setJobs(allJobs);
+      setAllJobs(allJobs);
+      setFetchingStatus('');
+      setLoading(false);
+      
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      setError('Failed to load jobs. Please try again.');
+      setLoading(false);
+      setFetchingStatus('');
     }
-    
-    // If no server jobs, use mock data
-    if (fetchedJobs.length === 0) {
-      fetchedJobs = mockJobs;
-      setFetchingStatus('📋 Loaded job database (15 positions available)');
-    }
-    
-    setAllJobs(fetchedJobs);
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    // Step 2: Match jobs with user profile
-    setFetchingStatus('🎯 Analyzing job matches for your profile...');
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Simulate matching algorithm
-    const matchedJobs = fetchedJobs.map(job => ({
-      ...job,
-      matchScore: Math.floor(Math.random() * 10) + 1,
-      matchedSkills: job.tags.slice(0, Math.floor(Math.random() * 3) + 1)
-    })).sort((a, b) => b.matchScore - a.matchScore);
-    
-    setFetchingStatus('✅ Found matching opportunities!');
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
-    setJobs(matchedJobs);
-    setFetchingStatus('');
-    setLoading(false);
   };
 
   const fetchFreshJobs = async () => {
@@ -83,59 +78,66 @@ const JobList = () => {
     setError('');
     setFetchingStatus('');
     
-    // Step 1: Fetch fresh jobs
-    setFetchingStatus('🔄 Refreshing job listings...');
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    setFetchingStatus('📡 Contacting job providers...');
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Try to get fresh jobs from server
-    let freshJobs = [];
     try {
-      const response = await jobsAPI.fetchJobs({ search: searchTerm, limit: 50 });
-      if (response.data.jobs && response.data.jobs.length > 0) {
-        freshJobs = response.data.jobs;
-        setFetchingStatus('✅ Fresh jobs retrieved from APIs');
+      // Step 1: Fetch fresh jobs from external APIs
+      setFetchingStatus('🔄 Fetching fresh jobs from external sources...');
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      let freshJobs = [];
+      try {
+        const response = await jobsAPI.fetchJobs({ search: searchTerm, limit: 50 });
+        if (response.data.jobs && response.data.jobs.length > 0) {
+          freshJobs = response.data.jobs;
+          setFetchingStatus('✅ Fresh jobs retrieved from APIs');
+        }
+      } catch (error) {
+        setFetchingStatus('⚠️ External APIs unavailable, checking database...');
+        await new Promise(resolve => setTimeout(resolve, 400));
       }
+      
+      // If no fresh jobs from APIs, fallback to database
+      if (freshJobs.length === 0) {
+        // Fallback to existing database jobs
+        try {
+          let query = searchTerm ? `?q=${encodeURIComponent(searchTerm)}&limit=50` : '?limit=50';
+          const searchResponse = await axios.get(`/api/jobs/search${query}`);
+          freshJobs = searchResponse.data.jobs || [];
+          setFetchingStatus(`📋 Found ${freshJobs.length} jobs in database`);
+        } catch (error) {
+          // Final fallback to filtered mock data
+          freshJobs = [...mockJobs];
+          if (searchTerm) {
+            freshJobs = mockJobs.filter(job =>
+              job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              job.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+          }
+          freshJobs = freshJobs.map(job => ({
+            ...job,
+            _id: job.apiJobId,
+            apiJobId: job.apiJobId,
+            company: job.company,
+            applicationUrl: job.url
+          }));
+          setFetchingStatus(`📋 Found ${freshJobs.length} sample jobs`);
+        }
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      setJobs(freshJobs);
+      setAllJobs(freshJobs);
+      setFetchingStatus('');
+      setFetchingJobs(false);
+      
     } catch (error) {
-      setFetchingStatus('⚠️ Using cached job database...');
-      await new Promise(resolve => setTimeout(resolve, 400));
+      console.error('Error refreshing jobs:', error);
+      setError('Failed to refresh jobs. Please try again.');
+      setFetchingJobs(false);
+      setFetchingStatus('');
     }
-    
-    // If no server jobs, filter mock data
-    if (freshJobs.length === 0) {
-      freshJobs = [...mockJobs];
-      if (searchTerm) {
-        freshJobs = mockJobs.filter(job =>
-          job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-      }
-      setFetchingStatus(`📋 Found ${freshJobs.length} matching positions`);
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Step 2: Re-analyze matches
-    setFetchingStatus('🎯 Re-analyzing job matches...');
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    const reMatchedJobs = freshJobs.map(job => ({
-      ...job,
-      matchScore: Math.floor(Math.random() * 10) + 1,
-      matchedSkills: job.tags.slice(0, Math.floor(Math.random() * 3) + 1)
-    })).sort((a, b) => b.matchScore - a.matchScore);
-    
-    setFetchingStatus('✅ Jobs refreshed successfully!');
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    setJobs(reMatchedJobs);
-    setAllJobs(reMatchedJobs);
-    setFetchingStatus('');
-    setFetchingJobs(false);
   };
 
   const handleJobSelect = (job) => {
@@ -162,8 +164,9 @@ const JobList = () => {
 
   const handleSendToEmail = () => {
     if (selectedJobs.length === 0) return;
-    // Navigate to selected jobs page or handle email sending
-    window.location.href = '/selected';
+    // Save selected jobs to localStorage and navigate
+    localStorage.setItem('selectedJobs', JSON.stringify(selectedJobs));
+    navigate('/selected');
   };
 
   const filteredJobs = jobs.filter(job =>
@@ -179,10 +182,10 @@ const JobList = () => {
         <div className="mb-12">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Your <span className="gradient-text">Job Matches</span>
+              Available <span className="gradient-text">Jobs</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              AI-curated opportunities tailored to your skills and experience
+              Discover exciting opportunities from top companies worldwide
             </p>
           </div>
           
@@ -198,9 +201,9 @@ const JobList = () => {
             </div>
             <div className="glass-card text-center">
               <div className="text-2xl font-bold gradient-text mb-1">
-                {filteredJobs.length > 0 ? Math.round(filteredJobs.reduce((acc, job) => acc + (job.matchScore || 0), 0) / filteredJobs.length) : 0}
+                {[...new Set(filteredJobs.map(job => job.company))].length}
               </div>
-              <div className="text-slate-400 text-sm">Avg Match Score</div>
+              <div className="text-slate-400 text-sm">Companies</div>
             </div>
           </div>
         </div>
@@ -297,7 +300,10 @@ const JobList = () => {
                     Select multiple jobs and send them to your email with one click
                   </p>
                 </div>
-                <button className="btn-primary">
+                <button 
+                  onClick={() => navigate('/premium')}
+                  className="btn-primary"
+                >
                   Upgrade Now
                 </button>
               </div>

@@ -18,6 +18,10 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  applicationUrl: {
+    type: String,
+    required: true
+  },
   description: {
     type: String,
     default: ''
@@ -26,6 +30,22 @@ const jobSchema = new mongoose.Schema({
     type: String,
     lowercase: true
   }],
+  location: {
+    type: String,
+    default: ''
+  },
+  salary: {
+    type: String,
+    default: ''
+  },
+  jobType: {
+    type: String,
+    default: 'Full-time'
+  },
+  experienceLevel: {
+    type: String,
+    default: 'Mid-level'
+  },
   publication_date: {
     type: Date
   },

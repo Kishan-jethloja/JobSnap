@@ -92,6 +92,55 @@ router.get('/my-resume', authMiddleware, async (req, res) => {
   }
 });
 
+// @route   GET /api/resume/skills
+// @desc    Get extracted skills from user's resume
+// @access  Private
+router.get('/skills', authMiddleware, async (req, res) => {
+  try {
+    const resume = await Resume.findOne({ userId: req.user.id }).sort({ uploadedAt: -1 });
+    
+    if (!resume) {
+      return res.status(404).json({ message: 'No resume found. Please upload a resume first.' });
+    }
+
+    res.json({
+      skills: resume.skills,
+      totalSkills: resume.skills.length,
+      uploadedAt: resume.uploadedAt
+    });
+  } catch (error) {
+    console.error('Get skills error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/resume/data
+// @desc    Get complete resume data including text and skills
+// @access  Private
+router.get('/data', authMiddleware, async (req, res) => {
+  try {
+    const resume = await Resume.findOne({ userId: req.user.id }).sort({ uploadedAt: -1 });
+    
+    if (!resume) {
+      return res.status(404).json({ message: 'No resume found. Please upload a resume first.' });
+    }
+
+    res.json({
+      resume: {
+        id: resume._id,
+        parsedText: resume.parsedText,
+        skills: resume.skills,
+        totalSkills: resume.skills.length,
+        uploadedAt: resume.uploadedAt,
+        contentType: resume.contentType
+      }
+    });
+  } catch (error) {
+    console.error('Get resume data error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // @route   GET /api/resume/resume/:id/download
 // @desc    Download resume PDF
 // @access  Private
