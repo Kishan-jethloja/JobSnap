@@ -5,11 +5,12 @@ const Job = require('./models/Job');
 // Connect to MongoDB directly
 const connectDB = async () => {
   try {
-    // Try different MongoDB connection strings
-    const connectionStrings = [
-      'mongodb://localhost:27017/jobsnap',
-      'mongodb://127.0.0.1:27017/jobsnap',
-      'mongodb://localhost:27017/jobsnap?retryWrites=true&w=majority'
+    // Try env first, otherwise default to jobsnapDB
+    const envUri = process.env.MONGO_URI;
+    const connectionStrings = envUri ? [envUri] : [
+      'mongodb://localhost:27017/jobsnapDB',
+      'mongodb://127.0.0.1:27017/jobsnapDB',
+      'mongodb://localhost:27017/jobsnapDB?retryWrites=true&w=majority'
     ];
     
     let connected = false;

@@ -6,7 +6,7 @@ const Job = require('./server/models/Job');
 // Connect to MongoDB
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/jobsnap');
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/jobsnapDB');
     console.log('✅ Connected to MongoDB');
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);

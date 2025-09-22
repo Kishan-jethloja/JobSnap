@@ -20,20 +20,36 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-out;
+    @apply inline-flex items-center justify-center whitespace-nowrap bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-colors duration-300 ease-out select-none;
   }
   
   .btn-secondary {
-    @apply bg-slate-700/50 hover:bg-slate-600/60 text-slate-200 font-medium py-3 px-6 rounded-xl border border-slate-600/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg;
+    @apply inline-flex items-center justify-center whitespace-nowrap bg-slate-700/50 hover:bg-slate-600/60 text-slate-200 font-medium py-3 px-6 rounded-xl border border-slate-600/50 backdrop-blur-sm transition-colors duration-300 hover:shadow-lg select-none;
   }
   
   .btn-outline {
-    @apply border-2 border-indigo-500/50 text-indigo-400 hover:bg-indigo-500 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/25 hover:scale-105;
+    @apply inline-flex items-center justify-center whitespace-nowrap border-2 border-indigo-500/50 text-indigo-400 hover:bg-indigo-500 hover:text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-300 hover:shadow-lg hover:shadow-indigo-500/25 select-none;
   }
 
   .btn-glow {
     @apply btn-primary animate-glow;
   }
+
+  /* Prevent button size shifting on active/focus */
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline,
+  .btn-glow {
+    @apply min-h-[44px] px-6 py-3; /* consistent tap target */
+  }
+
+  .btn-primary:active,
+  .btn-secondary:active,
+  .btn-outline:active,
+  .btn-glow:active {
+    @apply transform-none; /* no scale change on click */
+  }
+  
   
   .input-field {
     @apply bg-gray-800/50 border border-gray-600/50 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent backdrop-blur-sm transition-all duration-300 placeholder-gray-400;

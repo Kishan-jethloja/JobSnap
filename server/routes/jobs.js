@@ -145,22 +145,117 @@ const mockJobs = [
   }
 ];
 
-// Function to try multiple job APIs
+// Function to aggregate jobs from multiple sources/queries up to the requested limit
 async function fetchJobsFromAPIs(search, limit) {
-  const apis = [
-    // Try Adzuna API (free tier available)
-    async () => {
+  const target = Math.max(1, parseInt(limit) || 50);
+  const results = [];
+  const seenIds = new Set();
+
+  function addUnique(mappedJobs) {
+    for (const job of mappedJobs) {
+      const id = job && (job.id || job.job_id || job.uuid || job._id);
+      if (!id) continue;
+      const key = String(id);
+      if (seenIds.has(key)) continue;
+      seenIds.add(key);
+      results.push(job);
+      if (results.length >= target) break;
+    }
+  }
+
+  const searchTerms = Array.from(new Set([
+    search?.toString().trim(),
+    'developer',
+    'engineer',
+    'frontend',
+    'backend',
+    'full stack',
+    'react',
+    'node',
+    'python',
+    'java',
+    'data',
+    'devops'
+  ].filter(Boolean)));
+
+  // 1) Remotive aggregation across multiple searches
+  try {
+    const apiUrl = process.env.REMOTIVE_API || 'https://remotive.io/api/remote-jobs';
+    for (const term of searchTerms) {
+      if (results.length >= target) break;
+      const params = new URLSearchParams();
+      params.append('search', term);
+      params.append('limit', '50');
+      const response = await axios.get(`${apiUrl}?${params.toString()}`, {
+        timeout: 12000,
+        headers: { 'User-Agent': 'JobSnap/1.0', 'Accept': 'application/json' }
+      });
+      const jobs = response.data?.jobs || [];
+      addUnique(jobs.map(job => ({
+        id: job.id,
+        title: job.title,
+        company_name: job.company_name || job.company || 'Unknown Company',
+        url: job.url || '#',
+        description: job.description || '',
+        tags: Array.isArray(job.tags) ? job.tags : (job.job_type ? [job.job_type] : []),
+        publication_date: job.publication_date || job.created_at
+      })));
+    }
+  } catch (err) {
+    console.log(`Remotive aggregation failed: ${err.message}`);
+  }
+
+  // 2) JSearch via RapidAPI (if key is provided) - aggregate across pages and queries
+  if (results.length < target && process.env.RAPIDAPI_KEY) {
+    try {
+      for (const term of searchTerms) {
+        if (results.length >= target) break;
+        for (let page = 1; page <= 3; page++) {
+          if (results.length >= target) break;
+          const response = await axios.get('https://jsearch.p.rapidapi.com/search', {
+            params: {
+              query: term,
+              page: String(page),
+              num_pages: '1'
+            },
+            headers: {
+              'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
+            },
+            timeout: 12000
+          });
+          const items = response.data?.data || [];
+          addUnique(items.map(job => ({
+            id: job.job_id,
+            title: job.job_title,
+            company_name: job.employer_name,
+            url: job.job_apply_link || '#',
+            description: job.job_description || '',
+            tags: job.job_employment_type ? [String(job.job_employment_type).toLowerCase()] : [],
+            publication_date: job.job_posted_at_datetime_utc
+          })));
+        }
+      }
+    } catch (err) {
+      console.log(`JSearch aggregation failed: ${err.message}`);
+    }
+  }
+
+  // 3) Adzuna as a lightweight fallback to top up a few results
+  if (results.length < target) {
+    try {
       const response = await axios.get('https://api.adzuna.com/v1/api/jobs/us/search/1', {
         params: { 
-          app_id: 'test', // You can get a free API key from adzuna.com
+          app_id: 'test',
           app_key: 'test',
-          results_per_page: Math.min(limit, 20),
+          results_per_page: 20,
           what: search || 'developer'
         },
         timeout: 10000,
         headers: { 'User-Agent': 'JobSnap/1.0' }
       });
-      return response.data.results?.map(job => ({
+      const items = response.data?.results || [];
+      addUnique(items.map(job => ({
         id: job.id,
         title: job.title,
         company_name: job.company?.display_name || 'Unknown Company',
@@ -168,68 +263,18 @@ async function fetchJobsFromAPIs(search, limit) {
         description: job.description || '',
         tags: job.category?.tag ? [job.category.tag] : [],
         publication_date: job.created
-      })) || [];
-    },
-    // Try Remotive API
-    async () => {
-      const apiUrl = process.env.REMOTIVE_API || 'https://remotive.io/api/remote-jobs';
-      const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      params.append('limit', limit);
-      
-      const response = await axios.get(`${apiUrl}?${params.toString()}`, {
-        timeout: 10000,
-        headers: { 'User-Agent': 'JobSnap/1.0', 'Accept': 'application/json' }
-      });
-      return response.data.jobs || [];
-    },
-    // Try JSearch API (RapidAPI - has free tier)
-    async () => {
-      if (!process.env.RAPIDAPI_KEY) {
-        throw new Error('No RapidAPI key available');
-      }
-      const response = await axios.get('https://jsearch.p.rapidapi.com/search', {
-        params: {
-          query: search || 'developer',
-          page: '1',
-          num_pages: '1'
-        },
-        headers: {
-          'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
-          'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
-        },
-        timeout: 10000
-      });
-      return response.data.data?.map(job => ({
-        id: job.job_id,
-        title: job.job_title,
-        company_name: job.employer_name,
-        url: job.job_apply_link || '#',
-        description: job.job_description || '',
-        tags: job.job_employment_type ? [job.job_employment_type.toLowerCase()] : [],
-        publication_date: job.job_posted_at_datetime_utc
-      })) || [];
-    }
-  ];
-
-  // Try each API in sequence
-  for (let i = 0; i < apis.length; i++) {
-    try {
-      console.log(`Trying job API ${i + 1}...`);
-      const jobs = await apis[i]();
-      if (jobs && jobs.length > 0) {
-        console.log(`✅ Successfully fetched ${jobs.length} jobs from API ${i + 1}`);
-        return jobs;
-      }
-    } catch (error) {
-      console.log(`❌ API ${i + 1} failed: ${error.message}`);
-      continue;
+      })));
+    } catch (err) {
+      console.log(`Adzuna fallback failed: ${err.message}`);
     }
   }
 
-  // If all APIs fail, return mock data
-  console.log('🔄 All APIs failed, using mock data');
-  return mockJobs.slice(0, limit);
+  if (results.length === 0) {
+    console.log('🔄 APIs returned no data, using mock data');
+    return mockJobs.slice(0, target);
+  }
+
+  return results.slice(0, target);
 }
 
 // @route   GET /api/jobs/fetch

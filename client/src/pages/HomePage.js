@@ -246,27 +246,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-slate-700/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">J</span>
-              </div>
-              <span className="text-xl font-bold gradient-text">JobSnap</span>
-            </div>
-            <div className="flex items-center space-x-8">
-              <Link to="/privacy" className="text-slate-400 hover:text-white transition-colors">Privacy</Link>
-              <Link to="/terms" className="text-slate-400 hover:text-white transition-colors">Terms</Link>
-              <Link to="/contact" className="text-slate-400 hover:text-white transition-colors">Contact</Link>
-            </div>
-            <div className="text-slate-400 text-sm mt-4 md:mt-0">
-              © 2024 JobSnap. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Footer removed on HomePage to avoid duplicate footer */}
     </div>
   );
 };

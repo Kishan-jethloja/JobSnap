@@ -55,6 +55,7 @@ export const resumeAPI = {
 export const jobsAPI = {
   fetchJobs: (params) => api.get('/jobs/fetch', { params }),
   matchJobs: () => api.post('/jobs/match'),
+  getMatchedJobs: (params) => api.get('/jobs/match', { params }),
   searchJobs: (params) => api.get('/jobs/search', { params }),
   getAllJobs: (params) => api.get('/jobs/all', { params }),
 };

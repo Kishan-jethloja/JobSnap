@@ -36,11 +36,29 @@ const JobList = () => {
     setFetchingStatus('');
     
     try {
-      setFetchingStatus('📋 Loading available jobs...');
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      setFetchingStatus('🎯 Loading matched jobs based on your resume...');
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      let matchedJobs = [];
+      try {
+        const matchResp = await jobsAPI.getMatchedJobs({ limit: 50, page: 1 });
+        matchedJobs = (matchResp.data && matchResp.data.jobs) || [];
+      } catch (e) {
+        // ignore and fallback below
+      }
+
+      if (matchedJobs.length > 0) {
+        setJobs(matchedJobs);
+        setAllJobs(matchedJobs);
+        setFetchingStatus('✅ Showing matched jobs');
+        setLoading(false);
+        return;
+      }
+
+      setFetchingStatus('📋 No matches yet, loading all jobs...');
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       let allJobs = [];
-      
       try {
         const allJobsResponse = await axios.get('/api/jobs/all?limit=50');
         allJobs = allJobsResponse.data.jobs || [];
@@ -58,7 +76,7 @@ const JobList = () => {
         setFetchingStatus('📋 Using sample job data');
       }
       
-      await new Promise(resolve => setTimeout(resolve, 400));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       setJobs(allJobs);
       setAllJobs(allJobs);
@@ -227,26 +245,10 @@ const JobList = () => {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={fetchFreshJobs}
-                disabled={fetchingJobs}
-                className="btn-secondary flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={fetchAllJobs}
+                className="btn-primary"
               >
-                {fetchingJobs ? (
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center">
-                      <LoadingSpinner size="sm" />
-                      <span className="ml-2">Refreshing...</span>
-                    </div>
-                    {fetchingStatus && (
-                      <span className="text-xs text-indigo-400 mt-1">{fetchingStatus}</span>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    <AdjustmentsHorizontalIcon className="w-5 h-5 mr-2" />
-                    Refresh Jobs
-                  </>
-                )}
+                Show Matched Jobs
               </button>
 
               {isPremium && selectedJobs.length > 0 && (
@@ -386,13 +388,7 @@ const JobList = () => {
                         Clear Search
                       </button>
                     )}
-                    <button
-                      onClick={fetchFreshJobs}
-                      className="btn-primary"
-                      disabled={fetchingJobs}
-                    >
-                      {fetchingJobs ? 'Loading...' : 'Refresh Jobs'}
-                    </button>
+                    
                   </div>
                 </div>
               </div>
