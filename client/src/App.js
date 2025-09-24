@@ -14,7 +14,6 @@ import ResumeUpload from './pages/ResumeUpload';
 import JobList from './pages/JobList';
 import SelectedJobsPage from './pages/SelectedJobsPage';
 import PremiumPage from './pages/PremiumPage';
-import AdminPanel from './pages/AdminPanel';
 import GmailCallback from './pages/GmailCallback';
 
 // Protected Route Component
@@ -77,11 +76,7 @@ const AppRoutes = () => {
               <PremiumPage />
             </ProtectedRoute>
           } />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminPanel />
-            </ProtectedRoute>
-          } />
+          {null}
           <Route path="/gmail/callback" element={<GmailCallback />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

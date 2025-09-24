@@ -252,17 +252,17 @@ const ResumeUpload = () => {
                     <button
                       onClick={handleUpload}
                       disabled={uploading}
-                      className="btn-glow disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                      className="btn-glow disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-40 h-10 whitespace-nowrap"
                     >
                       {uploading ? (
                         <>
-                          <LoadingSpinner size="sm" />
-                          <span className="ml-2">Uploading...</span>
+                          <span className="inline-block w-4 h-4 mr-2 border-2 border-slate-300 border-t-white rounded-full animate-spin"></span>
+                          <span>Uploading...</span>
                         </>
                       ) : (
                         <>
                           <RocketLaunchIcon className="w-4 h-4 mr-2" />
-                          Upload
+                          <span>Upload</span>
                         </>
                       )}
                     </button>

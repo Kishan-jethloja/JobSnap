@@ -282,7 +282,7 @@ const SelectedJobsPage = () => {
                 <button
                   onClick={handleSendEmail}
                   disabled={sending || selectedJobs.length === 0}
-                  className="btn-primary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-primary flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed min-w-[180px]"
                 >
                   {sending ? (
                     <>

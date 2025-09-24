@@ -130,7 +130,7 @@ const HomePage = () => {
             {/* Stats Section */}
             <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="hero-card text-center">
-                <div className="text-4xl font-bold gradient-text mb-2">10K+</div>
+                <div className="text-4xl font-bold gradient-text mb-2">2.1K+</div>
                 <div className="text-slate-400">Jobs Available</div>
               </div>
               <div className="hero-card text-center">
@@ -138,8 +138,8 @@ const HomePage = () => {
                 <div className="text-slate-400">Match Accuracy</div>
               </div>
               <div className="hero-card text-center">
-                <div className="text-4xl font-bold gradient-text mb-2">2.5K+</div>
-                <div className="text-slate-400">Happy Users</div>
+                <div className="text-4xl font-bold gradient-text mb-2">24/7</div>
+                <div className="text-slate-400">Support</div>
               </div>
             </div>
           </div>

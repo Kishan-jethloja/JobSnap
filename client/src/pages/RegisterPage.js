@@ -18,7 +18,6 @@ const RegisterPage = () => {
     confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -119,7 +118,7 @@ const RegisterPage = () => {
                     name="name"
                     type="text"
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-black"
                     placeholder="Enter your full name"
                     value={formData.name}
                     onChange={handleChange}
@@ -140,7 +139,7 @@ const RegisterPage = () => {
                     name="email"
                     type="email"
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-black"
                     placeholder="Enter your email address"
                     value={formData.email}
                     onChange={handleChange}
@@ -191,7 +190,7 @@ const RegisterPage = () => {
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showPassword ? 'text' : 'password'}
                     required
                     className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-black"
                     placeholder="Confirm your password"
@@ -199,17 +198,6 @@ const RegisterPage = () => {
                     onChange={handleChange}
                     disabled={loading}
                   />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeSlashIcon className="w-5 h-5" />
-                    ) : (
-                      <EyeIcon className="w-5 h-5" />
-                    )}
-                  </button>
                 </div>
               </div>
             </div>
@@ -232,19 +220,7 @@ const RegisterPage = () => {
               </button>
             </div>
 
-            {/* Terms and Privacy */}
-            <div className="text-center pt-4">
-              <p className="text-xs text-gray-500">
-                By creating an account, you agree to our{' '}
-                <Link to="/terms" className="text-indigo-600 hover:text-indigo-500 transition-colors">
-                  Terms of Service
-                </Link>
-                {' '}and{' '}
-                <Link to="/privacy" className="text-indigo-600 hover:text-indigo-500 transition-colors">
-                  Privacy Policy
-                </Link>
-              </p>
-            </div>
+            
           </form>
         </div>
 

@@ -58,7 +58,9 @@ function generateJobs(count) {
   console.log('Connecting to', uri);
   await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   try {
-    const toInsert = generateJobs(120);
+    const countArg = parseInt(process.argv[2], 10);
+    const count = Number.isFinite(countArg) && countArg > 0 ? countArg : 120;
+    const toInsert = generateJobs(count);
     let upserted = 0;
     for (const job of toInsert) {
       await Job.findOneAndUpdate({ apiJobId: job.apiJobId }, job, { upsert: true, new: true });
