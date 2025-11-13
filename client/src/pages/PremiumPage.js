@@ -80,45 +80,6 @@ const PremiumPage = () => {
     }
   };
 
-  const features = [
-    {
-      name: 'Job Selection & Email',
-      free: false,
-      premium: true,
-      description: 'Select multiple jobs and send them to your email with one click'
-    },
-    {
-      name: 'Advanced Job Matching',
-      free: 'Basic',
-      premium: 'Advanced',
-      description: 'Get better job matches with enhanced AI algorithms'
-    },
-    {
-      name: 'Resume Analysis',
-      free: 'Basic',
-      premium: 'Detailed',
-      description: 'Comprehensive resume analysis with improvement suggestions'
-    },
-    {
-      name: 'Job Applications',
-      free: '10/month',
-      premium: 'Unlimited',
-      description: 'Apply to as many jobs as you want'
-    },
-    {
-      name: 'Email Support',
-      free: false,
-      premium: true,
-      description: 'Priority email support for all your questions'
-    },
-    {
-      name: 'Job Alerts',
-      free: false,
-      premium: true,
-      description: 'Get notified when new jobs match your skills'
-    }
-  ];
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -155,7 +116,7 @@ const PremiumPage = () => {
               JobSnap Premium
             </h1>
             <p className="text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-              Unlock the full power of AI-driven job matching and premium features to accelerate your career
+              Unlock premium features to accelerate your career
             </p>
           </div>
 
@@ -256,10 +217,9 @@ const PremiumPage = () => {
                   {[
                     { text: "Basic job matching", included: true },
                     { text: "Resume upload & parsing", included: true },
-                    { text: "10 job applications/month", included: true },
                     { text: "Job selection & email", included: false },
                     { text: "Priority support", included: false },
-                    { text: "Advanced AI matching", included: false }
+                    { text: "Advanced matching", included: false }
                   ].map((feature, index) => (
                     <div key={index} className="flex items-center space-x-3">
                       {feature.included ? (
@@ -302,7 +262,6 @@ const PremiumPage = () => {
                   {[
                     "Advanced AI job matching",
                     "Job selection & email sending", 
-                    "Unlimited applications",
                     "Detailed resume analysis",
                     "Priority email support",
                     "Job alerts & notifications"
@@ -336,96 +295,36 @@ const PremiumPage = () => {
             </div>
           )}
 
-          {/* Feature Comparison */}
-          <div className="mb-16 animate-fade-in" style={{animationDelay: '0.6s'}}>
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent text-center mb-12">
-              Feature Comparison
-            </h2>
-            <div className="glass-card overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-700/50">
-                      <th className="text-left py-6 px-8 text-white font-bold text-lg">Feature</th>
-                      <th className="text-center py-6 px-8 text-white font-bold text-lg">Free</th>
-                      <th className="text-center py-6 px-8 text-white font-bold text-lg">Premium</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {features.map((feature, index) => (
-                      <tr key={index} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                        <td className="py-6 px-8">
-                          <div>
-                            <div className="text-white font-semibold text-lg mb-1">{feature.name}</div>
-                            <div className="text-slate-400 text-sm leading-relaxed">{feature.description}</div>
-                          </div>
-                        </td>
-                        <td className="text-center py-6 px-8">
-                          {feature.free === true ? (
-                            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                              <CheckIcon className="w-5 h-5 text-white" />
-                            </div>
-                          ) : feature.free === false ? (
-                            <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto">
-                              <XMarkIcon className="w-5 h-5 text-white" />
-                            </div>
-                          ) : (
-                            <span className="text-slate-300 font-medium">{feature.free}</span>
-                          )}
-                        </td>
-                        <td className="text-center py-6 px-8">
-                          {feature.premium === true ? (
-                            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                              <CheckIcon className="w-5 h-5 text-white" />
-                            </div>
-                          ) : feature.premium === false ? (
-                            <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto">
-                              <XMarkIcon className="w-5 h-5 text-white" />
-                            </div>
-                          ) : (
-                            <span className="text-yellow-400 font-bold">{feature.premium}</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {/* Benefits Section */}
+          <div className="mb-16 animate-fade-in" style={{animationDelay: '0.8s'}}>
+            <div className="flex justify-center">
+              <div className="flex flex-wrap justify-center gap-8">
+                {[
+                  {
+                    icon: EnvelopeIcon,
+                    title: "One-Click Email",
+                    description: "Select multiple jobs and send them to your email with a single click",
+                    gradient: "from-blue-500 to-cyan-500"
+                  },
+                  {
+                    icon: ShieldCheckIcon,
+                    title: "Priority Support",
+                    description: "Get help when you need it with priority email support",
+                    gradient: "from-emerald-500 to-teal-500"
+                  }
+                ].map((benefit, index) => (
+                  <div key={index} className="glass-card text-center hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10 p-6 w-full max-w-xs">
+                    <div className={`w-20 h-20 bg-gradient-to-br ${benefit.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg`}>
+                      <benefit.icon className="w-10 h-10 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-4">{benefit.title}</h3>
+                    <p className="text-slate-400 leading-relaxed">
+                      {benefit.description}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-
-          {/* Benefits Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 animate-fade-in" style={{animationDelay: '0.8s'}}>
-            {[
-              {
-                icon: EnvelopeIcon,
-                title: "One-Click Email",
-                description: "Select multiple jobs and send them to your email with a single click",
-                gradient: "from-blue-500 to-cyan-500"
-              },
-              {
-                icon: BoltIcon,
-                title: "AI-Powered Matching",
-                description: "Advanced AI algorithms provide more accurate job recommendations",
-                gradient: "from-purple-500 to-pink-500"
-              },
-              {
-                icon: ShieldCheckIcon,
-                title: "Priority Support",
-                description: "Get help when you need it with priority email support",
-                gradient: "from-emerald-500 to-teal-500"
-              }
-            ].map((benefit, index) => (
-              <div key={index} className="glass-card text-center hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10">
-                <div className={`w-20 h-20 bg-gradient-to-br ${benefit.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg`}>
-                  <benefit.icon className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-4">{benefit.title}</h3>
-                <p className="text-slate-400 leading-relaxed">
-                  {benefit.description}
-                </p>
-              </div>
-            ))}
           </div>
 
           {/* Demo Note */}

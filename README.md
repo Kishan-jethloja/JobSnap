@@ -1,53 +1,95 @@
 # JobSnap - AI-Powered Resume-Based Job Recommender
 
-JobSnap is a full-stack MERN application that uses AI to match your resume with the best remote job opportunities. Upload your PDF resume, get personalized job recommendations, and send selected jobs to your email with premium features.
+JobSnap is a full-stack MERN application that uses AI to match your resume with the best remote job opportunities.
 
 ## 🚀 Features
 
-- **Smart Resume Parsing**: Upload PDF resumes and extract skills automatically using AI
-- **Personalized Job Matching**: Get job recommendations tailored to your skills from Remotive API
-- **Premium Email Feature**: Select multiple jobs and send them to your email with one click
-- **Dark Theme UI**: Beautiful, responsive design with Tailwind CSS
-- **User Authentication**: Secure JWT-based authentication with bcrypt password hashing
-- **Premium Subscription**: Upgrade to unlock advanced features
-- **Admin Dashboard**: Basic admin panel with system statistics
+- **Smart Resume Parsing**: Upload PDF resumes and extract skills automatically
+- **Personalized Job Matching**: Get job recommendations based on your skills
+- **Email Integration**: Send selected jobs to your email
+- **Modern UI**: Responsive design with Tailwind CSS
+- **User Authentication**: Secure JWT-based authentication
 
 ## 🛠️ Tech Stack
 
-### Backend
-- **Node.js** with Express.js
-- **MongoDB** with Mongoose ODM
-- **JWT** for authentication
-- **bcryptjs** for password hashing
-- **Multer** for file uploads
-- **pdf-parse** for PDF text extraction
-- **NodeMailer** for email sending
-- **Axios** for API requests
+- **Frontend**: React.js, Tailwind CSS
+- **Backend**: Node.js, Express.js, MongoDB, Mongoose
+- **Authentication**: JWT, bcrypt
+- **File Handling**: Multer, pdf-parse
+- **Email**: NodeMailer
 
-### Frontend
-- **React.js** with React Router
-- **Tailwind CSS** for styling
-- **Axios** for API calls
-- **Heroicons** for icons
-- **JWT-decode** for token handling
+## 🚀 Getting Started
 
-## 📋 Prerequisites
-
+### Prerequisites
 - Node.js (v14 or higher)
-- MongoDB Atlas account or local MongoDB
-- Gmail account with App Password (for email features)
+- MongoDB (local or Atlas)
+- npm or yarn
 
-## 🔧 Installation & Setup
+### Installation
 
-### 1. Clone the Repository
-```bash
-git clone <repository-url>
-cd JobSnap
-```
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd JobSnap
+   ```
 
-### 2. Server Setup
-```bash
-cd server
+2. **Install backend dependencies**
+   ```bash
+   cd server
+   npm install
+   ```
+
+3. **Install frontend dependencies**
+   ```bash
+   cd ../client
+   npm install
+   ```
+
+### Environment Setup
+
+1. **Backend (.env)**
+   Create a `.env` file in the `server` directory with:
+   ```env
+   PORT=5000
+   MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret
+   NODE_ENV=development
+   ```
+
+2. **Frontend (.env)**
+   Create a `.env` file in the `client` directory with:
+   ```env
+   REACT_APP_API_URL=http://localhost:5000
+   ```
+
+### Database Setup
+
+1. **Using MongoDB Atlas**
+   - Create a new cluster on MongoDB Atlas
+   - Get your connection string
+   - Update `MONGODB_URI` in the backend `.env` file
+
+2. **Using Local MongoDB**
+   - Install MongoDB Community Edition
+   - Start MongoDB service
+   - Use `mongodb://localhost:27017/jobsnap` as `MONGODB_URI`
+
+### Running the Application
+
+1. **Start the backend server**
+   ```bash
+   cd server
+   npm run dev
+   ```
+
+2. **Start the frontend development server**
+   ```bash
+   cd ../client
+   npm start
+   ```
+
+3. **Access the application**
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 npm install
 ```
 

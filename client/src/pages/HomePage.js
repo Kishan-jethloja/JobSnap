@@ -58,7 +58,7 @@ const HomePage = () => {
     },
     {
       icon: RocketLaunchIcon,
-      title: 'Apply & Get Hired',
+      title: 'Send Email',
       description: 'Apply directly or use our premium email feature to send jobs to yourself',
       color: 'from-purple-500 to-pink-500'
     }
@@ -85,7 +85,7 @@ const HomePage = () => {
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-                AI-powered job matching that connects your skills with the perfect remote opportunities. 
+                Job matching platform that connects your skills with the perfect remote opportunities. 
                 Upload, analyze, and get hired faster than ever before.
               </p>
             </div>
@@ -101,11 +101,11 @@ const HomePage = () => {
                     Upload Resume
                   </Link>
                   <Link
-                    to="/jobs"
+                    to="/premium"
                     className="btn-outline text-xl px-10 py-4 inline-flex items-center group"
                   >
                     <BriefcaseIcon className="mr-3 w-6 h-6 group-hover:rotate-12 transition-transform" />
-                    Browse Jobs
+                    Get Premium
                   </Link>
                 </>
               ) : (
@@ -134,7 +134,7 @@ const HomePage = () => {
                 <div className="text-slate-400">Jobs Available</div>
               </div>
               <div className="hero-card text-center">
-                <div className="text-4xl font-bold gradient-text mb-2">95%</div>
+                <div className="text-4xl font-bold gradient-text mb-2">90%</div>
                 <div className="text-slate-400">Match Accuracy</div>
               </div>
               <div className="hero-card text-center">
@@ -154,7 +154,7 @@ const HomePage = () => {
               Why Choose <span className="gradient-text">JobSnap</span>?
             </h2>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              Our AI-powered platform revolutionizes job hunting with cutting-edge technology and personalized experiences
+              Our platform revolutionizes job hunting with cutting-edge technology and personalized experiences
             </p>
           </div>
           
@@ -192,14 +192,14 @@ const HomePage = () => {
             {steps.map((step, index) => (
               <div key={index} className="text-center group" style={{animationDelay: `${index * 0.2}s`}}>
                 <div className="relative mb-8">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500 group-hover:rotate-6`}>
-                    <step.icon className="w-10 h-10 text-white" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                    {index + 1}
+                  <div className={`w-24 h-24 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500 group-hover:rotate-6 relative`}>
+                    <step.icon className="w-12 h-12 text-white" />
+                    <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-base shadow-lg border-2 border-white">
+                      {index + 1}
+                    </div>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-slate-600 to-transparent"></div>
+                    <div className="hidden md:block absolute top-12 left-3/4 w-1/2 h-1 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50"></div>
                   )}
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:gradient-text transition-all duration-300">
@@ -223,7 +223,7 @@ const HomePage = () => {
               Ready to Find Your <span className="gradient-text">Dream Job</span>?
             </h2>
             <p className="text-xl text-slate-300 mb-10 leading-relaxed">
-              Join thousands of professionals who have transformed their careers with JobSnap's AI-powered job matching
+              Join thousands of professionals who have transformed their careers with JobSnap's job matching
             </p>
             {!isAuthenticated && (
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -25,6 +25,18 @@ const SelectedJobsPage = () => {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   
+  // Auto-dismiss messages after 5 seconds
+  useEffect(() => {
+    let timer;
+    if (success || error) {
+      timer = setTimeout(() => {
+        setSuccess('');
+        setError('');
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [success, error]);
+  
   // Gmail integration state
   const [gmailConnected, setGmailConnected] = useState(false);
   const [gmailEmail, setGmailEmail] = useState('');
