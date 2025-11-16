@@ -96,7 +96,6 @@ I am particularly drawn to this opportunity because:
 
 ${job.location ? `I am ${job.location.includes('Remote') ? 'available for remote work' : `available to work in ${job.location}`}.` : ''}
 
-I have attached my resume for your review and would welcome the opportunity to discuss how my skills and enthusiasm can contribute to your team's success.
 
 Thank you for considering my application. I look forward to hearing from you soon.
 

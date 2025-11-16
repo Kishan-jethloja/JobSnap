@@ -207,23 +207,6 @@ const JobList = () => {
             </p>
           </div>
           
-          {/* Stats Bar */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="glass-card text-center">
-              <div className="text-2xl font-bold gradient-text mb-1">{filteredJobs.length}</div>
-              <div className="text-slate-400 text-sm">Available Jobs</div>
-            </div>
-            <div className="glass-card text-center">
-              <div className="text-2xl font-bold gradient-text mb-1">{selectedJobs.length}</div>
-              <div className="text-slate-400 text-sm">Selected Jobs</div>
-            </div>
-            <div className="glass-card text-center">
-              <div className="text-2xl font-bold gradient-text mb-1">
-                {[...new Set(filteredJobs.map(job => job.company))].length}
-              </div>
-              <div className="text-slate-400 text-sm">Companies</div>
-            </div>
-          </div>
         </div>
 
         {/* Controls */}

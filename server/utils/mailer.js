@@ -82,11 +82,7 @@ const sendSelectedJobsEmail = async ({ to, jobs, userName, userId = null }) => {
         </div>
 
         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #666; font-size: 14px;">
-          <p>This email was sent by JobSnap - Your AI-powered job recommender</p>
-          <p>
-            <a href="#" style="color: #4f46e5; text-decoration: none;">Unsubscribe</a> | 
-            <a href="#" style="color: #4f46e5; text-decoration: none;">Update Preferences</a>
-          </p>
+          <p>This email was sent by JobSnap</p>
         </div>
       </body>
       </html>
@@ -135,14 +131,7 @@ const sendEmailViaGmail = async ({ to, jobs, userName, gmailAuth }) => {
     `).join('');
 
     const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Your Selected Jobs from JobSnap</title>
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
           <h1 style="color: #4f46e5; margin-bottom: 10px;">🎯 JobSnap</h1>
           <p style="color: #666; margin: 0;">Your Personalized Job Recommendations</p>
@@ -158,14 +147,9 @@ const sendEmailViaGmail = async ({ to, jobs, userName, gmailAuth }) => {
         </div>
 
         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #666; font-size: 14px;">
-          <p>This email was sent by JobSnap - Your AI-powered job recommender</p>
-          <p>
-            <a href="#" style="color: #4f46e5; text-decoration: none;">Unsubscribe</a> | 
-            <a href="#" style="color: #4f46e5; text-decoration: none;">Update Preferences</a>
-          </p>
+          <p>This email was sent by JobSnap</p>
         </div>
-      </body>
-      </html>
+      </div>
     `;
 
     // Try to include resume as attachment if available
@@ -176,24 +160,31 @@ const sendEmailViaGmail = async ({ to, jobs, userName, gmailAuth }) => {
       // We'll attach via SMTP path above; here we attach only if middleware later passes resume data.
     } catch (_) {}
 
-    // Build MIME message (multipart/mixed) so we can support attachments in Gmail
+    // Build MIME message (multipart/alternative) for HTML email
     const boundary = 'jobsnap_boundary_' + Date.now();
     const messageParts = [
       `To: ${to}`,
       `Subject: 🎯 ${jobs.length} Job Recommendations from JobSnap`,
       'MIME-Version: 1.0',
-      `Content-Type: multipart/mixed; boundary="' + boundary + '"`,
+      `Content-Type: multipart/alternative; boundary="${boundary}"`,
+      '',
+      `--${boundary}`,
+      'Content-Type: text/plain; charset="UTF-8"',
+      'Content-Transfer-Encoding: 7bit',
+      '',
+      `Hi ${userName}! Here are your selected jobs from JobSnap. Please enable HTML to view the formatted version.`,
       '',
       `--${boundary}`,
       'Content-Type: text/html; charset="UTF-8"',
       'Content-Transfer-Encoding: 7bit',
+      'MIME-Version: 1.0',
       '',
-      htmlContent
+      htmlContent,
+      '',
+      `--${boundary}--`
     ];
 
-    // We currently do not have resume buffer in this scope (no userId); keeping without attachment for Gmail path
-    messageParts.push(`--${boundary}--`);
-
+    // Join all message parts with line breaks
     const message = messageParts.join('\n');
 
     // Encode the message
